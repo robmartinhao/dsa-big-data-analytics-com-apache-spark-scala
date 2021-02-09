@@ -55,5 +55,40 @@ object SparkSQL extends App {
   // Cascateamento de Operações
   empDf.filter(empDf("idade") > 30).join(deptDf, empDf("deptid") === deptDf("id")).groupBy("deptid").agg(avg("salario"), max("idade")).show()
 
+
+  // Criando um dataframe a partir de arquivo csv
+  val autoDf = spSession.read.option("header", "true").csv(datadir + "dataset2-autos.csv")
+
+  autoDf.show(5)
+
+  // Criando dataframe a partir de um schema
+
+  import org.apache.spark.sql.Row
+  import org.apache.spark.sql.types._
+
+  val schema =
+    StructType(
+      StructField("id", IntegerType, false) ::
+        StructField("nome", StringType, false) :: Nil)
+
+  val productList = Array((1001, "Book"), (1002, "Perfume"))
+
+  val prodRDD = spContext.parallelize(productList)
+
+  prodRDD.count()
+  prodRDD.collect()
+
+
+  def transformToRow(input: (Int, String)): Row = {
+
+    // Filtrando as colunas
+    val values = Row(input._1, input._2)
+    return values
+  }
+
+  val prodRDD2 = prodRDD.map(transformToRow)
+
+  val prodDf = spSession.createDataFrame(prodRDD2, schema)
+  prodDf.show()
 }
 

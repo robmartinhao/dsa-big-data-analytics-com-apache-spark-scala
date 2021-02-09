@@ -12,7 +12,7 @@ object SparkUtils {
   object SparkUtils {
 
     // Diretório onde estão os datasets
-    val datadir = "/home/robson/Projects/dsa-big-data-analytics-com-apache-spark-scala/datasets"
+    val datadir = "/home/robson/Projects/dsa-big-data-analytics-com-apache-spark-scala/datasets/"
 
     // Nome da Instância Spark (pode ser qualquer nome)
     val appName = "SparkML"
