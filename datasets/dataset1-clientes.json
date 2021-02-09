@@ -1,0 +1,5 @@
+ { "nome": "Pele Moraes", "sexo": "male", "deptid": "1000", "idade": "72", "salario": "90000" }
+ { "nome": "Zico Garcia", "sexo": "male", "deptid": "2000", "idade": "60", "salario": "75000" }
+ { "nome": "Rivelino Silva", "sexo": "male", "deptid": "1000", "idade": "66", "salario": "57000" }
+ { "nome": "Ronaldo Teixeira", "sexo": "male", "deptid": "1000", "idade": "41", "salario": "63000" }
+ { "nome": "Marta Pereira", "sexo": "female", "deptid": "2000", "idade": "44", "salario": "85000" }
