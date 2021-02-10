@@ -73,4 +73,50 @@ object SparkMLKMeansClustering extends App {
   autoDf.printSchema()
   autoDf.show(5)
 
+
+  // Clustering - Center e Scaling
+
+  val meanVal = autoDf.agg(avg("DOORS"), avg("BODY"), avg("HP"), avg("RPM"), avg("MPG")).collectAsList().get(0)
+
+  val stdVal = autoDf.agg(stddev("DOORS"), stddev("BODY"), stddev("HP"),stddev("RPM"),stddev("MPG")).collectAsList().get(0)
+
+  val bcMeans = spContext.broadcast(meanVal)
+  val bcStdDev = spContext.broadcast(stdVal)
+
+  def centerAndScale(inRow : Row ) : LabeledPoint  = {
+    val meanArray = bcMeans.value
+    val stdArray = bcStdDev.value
+
+    var retArray = Array[Double]()
+
+    for (i <- 0 to inRow.size - 1)  {
+      val csVal = ( inRow.getDouble(i) - meanArray.getDouble(i)) /
+        stdArray.getDouble(i)
+      retArray = retArray :+ csVal
+    }
+    return  new LabeledPoint(1.0,Vectors.dense(retArray))
+  }
+
+  val tempRdd1 = autoDf.rdd.repartition(2);
+  val autoCSRDD = tempRdd1.map(centerAndScale)
+  autoCSRDD.collect()
+
+  val autoDf2 = spSession.createDataFrame(autoCSRDD, classOf[LabeledPoint] )
+
+  println("Dados Prontos Para o Modelo")
+  autoDf2.select("label","features").show(10)
+
+  import  org.apache.spark.ml.clustering.KMeans
+  val kmeans = new KMeans()
+  kmeans.setK(4)
+  kmeans.setSeed(1L)
+
+  // Criando Modelo K-Means para Clusterização
+  val model = kmeans.fit(autoDf2)
+  val predictions = model.transform(autoDf2)
+
+  println("Grupos :")
+  predictions.select("features","prediction").show()
+  predictions.groupBy("prediction").count().show()
+
 }
